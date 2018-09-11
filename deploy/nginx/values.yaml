@@ -1,0 +1,15 @@
+## The application name
+appName: nginx
+
+## The application service ports
+httpPort: 80
+
+## Pod settings
+replicas: 3
+image: "nginx"
+imageTag: "latest"
+imagePullPolicy: "Always"
+
+## Expose
+service:
+  type: LoadBalancer

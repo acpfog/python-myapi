@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.appName }}
+  labels:
+    # labels for a release management
+    app: {{ .Values.appName }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+spec:
+  selector:
+    # attache pods with this label to the service
+    app: {{ .Values.appName }}
+  ports:
+    # the application service port
+    - name: http
+      port: {{ .Values.httpPort }}
+  # settings for exposing the server outside a cluster
+{{- if eq .Values.service.type "LoadBalancer" }}
+  # expose using a load balancer IP address in a cloud
+  type: {{ .Values.service.type }}
+  {{- if .Values.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
+  {{- end }}
+{{- else if .Values.service.externalIPs }}
+  # expose using an external IP address if not in a cloud
+  externalIPs:
+{{ toYaml .Values.service.externalIPs | indent 4 }}
+{{- end }}

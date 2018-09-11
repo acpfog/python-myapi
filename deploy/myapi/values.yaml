@@ -1,0 +1,18 @@
+## The application name
+appName: myapi
+
+## The application service ports
+apiPort: 5000
+
+## Pod settings
+replicas: 3
+image: "myapi-app"
+imageTag: "latest"
+imagePullPolicy: "Always"
+
+## Settings for a connection to a PostgreSQL database
+database:
+  host: localhost
+  name: myapi
+  user: myapi
+  pass: myapi

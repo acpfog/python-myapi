@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-hosts
+  labels:
+    # labels for a release management
+    app: {{ .Values.appName }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+data:
+  # a config file with a virtual host configuration for a front-end proxy
+  hosts.conf: |2
+    upstream myapi {
+      server myapi.default.svc:5000 fail_timeout=0;
+    }
+
+    server {
+
+      listen 80 default_server;
+
+      location / {
+
+        proxy_pass http://myapi;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+      }
+
+    }

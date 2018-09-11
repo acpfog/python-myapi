@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.appName }}-config
+  labels:
+    # labels for a release management
+    app: {{ .Values.appName }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+data:
+  # settings for a connection to a database in PostgreSQL
+  database_host: {{ .Values.database.host }}
+  database_name: {{ .Values.database.name }}
+  database_user: {{ .Values.database.user }}

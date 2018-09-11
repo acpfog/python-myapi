@@ -1,0 +1,56 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    # labels for a release management
+    app: {{ .Values.appName }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+spec:
+  # the amount of the application replicas
+  replicas: {{ default 0 .Values.replicas }}
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      name: {{ .Release.Name }}
+      labels:
+        # labels for pods maintenance
+        app: {{ .Values.appName }}
+        release: {{ .Release.Name }}
+        chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    spec:
+      containers:
+        - name: {{ .Release.Name }}
+          # the application iamge
+          image: {{ .Values.image }}:{{ .Values.imageTag }}
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          ports:
+            # the application service port
+            - name: api
+              containerPort: {{ .Values.apiPort }}
+              protocol: TCP
+          env:
+            # set environment variables for the application
+            - name: DATABASE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.appName }}-config
+                  key: database_host
+            - name: DATABASE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.appName }}-config
+                  key: database_name
+            - name: DATABASE_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.appName }}-config
+                  key: database_user
+            - name: DATABASE_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.appName }}-secret
+                  key: database_pass
